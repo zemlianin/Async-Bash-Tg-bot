@@ -8,6 +8,7 @@ test_job(){
 }
 
 main() {
+   echo "main func pid:$$"
    build src
    add_job test_job 2 5
    job_runner_start
