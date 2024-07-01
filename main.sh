@@ -3,10 +3,14 @@ source settings.sh
 source extensions/using.sh
 using extensions
 
+test_job(){
+   echo 'penis'
+}
+
 main() {
-   build trash
-   
-   wait
+   build src
+   add_job test_job 2 5
+   job_runner_start
 }
 
 main

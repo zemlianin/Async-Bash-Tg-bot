@@ -20,8 +20,8 @@ get_build_files(){
     # Считываем все файлы в массив
     for path in "$directory"/*
     do
-        # Проверяем, является ли элемент файлом с суффиксом order_{N}
-        if [[ -f "$path" && "$path" =~ order_[0-9]+\.sh$ ]]; then
+        # Проверяем, является ли элемент файлом с суффиксом o{N}
+        if [[ -f "$path" && "$path" =~ o[0-9]+\.sh$ ]]; then
             first_line=$(head -n 1 "$path")
             firs_line_only_num=$(echo "$first_line" | sed 's/# order //g')
             combined_value="$firs_line_only_num:$path"
