@@ -7,12 +7,16 @@ test_job(){
    echo "test job"
 }
 
-main() {
-   build src
-   add_job test_job 2 5
-
+startup() {
    process_killer_start
    job_runner_start
+}
+
+main() {
+   using src
+   add_job test_job 2 5
+
+   
 
    sleep 10
 }

@@ -1,5 +1,3 @@
-# order 1000
-
 JOBS_LIST=()
 
 add_job(){

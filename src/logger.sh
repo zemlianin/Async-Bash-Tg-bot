@@ -1,5 +1,3 @@
-# order 10
-
 # $1 = message
 # $2 = level
 default_handler(){
