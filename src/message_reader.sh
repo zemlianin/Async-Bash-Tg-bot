@@ -1,33 +1,42 @@
 reader_init() {
     mkdir -p "$BASE_FIFO_DIR"
-
-    if [ ! -f "$LAST_UPDATE_FILE" ]; then
-        echo "0" > "$LAST_UPDATE_FILE"
-    fi
+    LAST_UPDATE_ID=0
 }
 
 fetch_messages() {
-    exec 200>"$LOCK_FILE"
-    flock -n 200 || { echo "Failed to acquire lock"; continue; }
+    default_handler "start fetching $LAST_UPDATE_ID" "INFO"
 
-    local last_update_id=$(cat "$LAST_UPDATE_FILE")
-    local messages=($(get_tg_messages $last_update_id))
-    
-    for message in $messages; do
-      update_id=$(echo $message | jq '.update_id')
-      echo "$update_id" > "$LAST_UPDATE_FILE"
-      text=$(echo $message | jq -r '.text')
-      echo "$text" > "$fifo"
-    done
+    local messages=$(get_tg_messages $LAST_UPDATE_ID)
 
-    # Освобождаем блокировку
-    flock -u 200
-    sleep 1
+    while IFS= read -r message; do
+        update_id=$(echo "$message" | jq '.update_id')
+        chat_id=$(echo "$message" | jq '.message.chat.id')
+
+        if (( LAST_UPDATE_ID >= update_id )); then
+            continue 
+        fi
+
+        LAST_UPDATE_ID="$update_id"
+
+        fifo="$BASE_FIFO_DIR/$chat_id"
+        
+        if [[ ! -p "$fifo" ]]; then
+            mkfifo "$fifo"
+            catch 'default_handler "Error of mkfifo" "ERROR"'
+        fi
+
+        text=$(echo "$message" | jq -r '.message.text')
+        default_handler "text to $fifo" "INFO"
+        echo "$text" > "$fifo"
+    done < <(echo "$messages" | jq -c '.[]')
 }
 
 get_tg_messages(){
     local last_update_id=$1
-    local updates=$(curl -s "https://api.telegram.org/bot$token/getUpdates?offset=$((last_update_id + 1))&timeout=10")
-    local messages=$(echo $updates | jq -c '.result[] | select(.message.chat.id == '$chat_id') | .message')
-    echo "${messages[@]}"
+    local updates=$(curl -s "https://api.telegram.org/bot$BOT_TOKEN/getUpdates?offset=$last_update_id")
+
+    messages=$(echo "$updates" | jq -c '.result')
+
+    default_handler "$messages" "Info"
+    echo "$messages"
 }

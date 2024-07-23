@@ -2,10 +2,7 @@
 source settings.sh
 source extensions/using.sh
 using extensions
-
-test_job(){
-   echo "test job"
-}
+using src
 
 startup() {
    process_killer_start
@@ -13,12 +10,11 @@ startup() {
 }
 
 main() {
-   using src
-   add_job test_job 2 5
-
-   
-
-   sleep 10
+   reader_init
+   add_job fetch_messages 1 5
+   add_job process_messages 1 2
 }
 
 main
+startup
+sleep 100
