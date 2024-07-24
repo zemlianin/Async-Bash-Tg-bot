@@ -1,6 +1,4 @@
-init_killer(){
-    CHILD_PIDS=()
-}
+CHILD_PIDS=()
 
 add_new_pid_for_killing(){
     local pid=$1

@@ -1,6 +1,4 @@
-init_job_runner(){
-    export JOBS_LIST=()
-}
+JOBS_LIST=()
 
 add_job(){
     local function="$1"
@@ -14,6 +12,7 @@ add_job(){
 
 
 job_runner_start(){
+    echo "${JOBS_LIST[@]}"
     for job in "${JOBS_LIST[@]}"
     do
         IFS=':'

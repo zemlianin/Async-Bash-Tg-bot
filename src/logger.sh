@@ -1,5 +1,3 @@
-# $1 = message
-# $2 = level
 default_handler(){
     local message=$1
     local level=$2

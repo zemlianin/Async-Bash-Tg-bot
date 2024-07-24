@@ -1,33 +1,50 @@
-init_balancer(){
-  export WORKER_FIFO_LIST=()
-}
+WORKER_FIFO_LIST=()
+declare -A CHAT_DICTIONARY
 
 balancer_process() {
   local fifo="$NOTIFICATIONS_FIFO"
-  echo "$fifo"
-
-  echo "Вне цикла"
   
   while IFS= read -r notification; do
-    chat_id="${notification%:}"
-      
-    ((CHAT_DICTIONARY["$chat_id"]++))
+    if [[ $notification != *"!"* ]]; then
+      chat_id="$notification"
+      ((CHAT_DICTIONARY["$chat_id"]++))
+      echo "Балансер заметил сообщение"
+#      for id in "${!CHAT_DICTIONARY[@]}"; do
+#        echo "Chat ID $id has ${CHAT_DICTIONARY[$id]} messages."
+#      done
+    else
+      chat_id="${notification#!}"
 
-    for id in "${!CHAT_DICTIONARY[@]}"; do
-      echo "Chat ID $id has ${CHAT_DICTIONARY[$id]} messages."
-    done
-
+      update_worker_status $chat_id
+    fi
     update_workers
     balance
   done < "$NOTIFICATIONS_FIFO"
+}
+
+update_worker_status() {
+    local target_id="$1"
+    local updated_list=()
+    
+    for entry in "${WORKER_FIFO_LIST[@]}"; do
+        IFS=":" read -r pid chat_id <<< "$entry"
+        
+        if [[ "$chat_id" == "$target_id" ]]; then
+            updated_list+=("$pid:0")
+        else
+            updated_list+=("$entry")
+        fi
+    done
+
+    WORKER_FIFO_LIST=("${updated_list[@]}")
 }
 
 update_workers() {
     for fifo in "$WORKERS_FIFO_DIR"/*; do
         if [[ -p "$fifo" ]]; then
             pid=$(basename "$fifo")
-            if [[ ! " ${WORKER_FIFO_LIST[@]} " =~ " ${pid} " ]]; then
-                WORKER_FIFO_LIST+=("$pid")
+            if [[ ! " ${WORKER_FIFO_LIST[*]} " == *"$pid"* ]]; then
+                WORKER_FIFO_LIST+=("$pid:0")
                 echo "Добавлен новый воркер с PID: $pid"
             fi
         fi
@@ -35,5 +52,27 @@ update_workers() {
 }
 
 balance() {
-  
+  for i in "${!WORKER_FIFO_LIST[@]}"; do
+      IFS=":" read -r worker_pid chat_id <<< "${WORKER_FIFO_LIST[i]}"
+
+      if [[ "$chat_id" == "0" ]]; then
+          for current_chat_id in "${!CHAT_DICTIONARY[@]}"; do
+              if [[ "${CHAT_DICTIONARY[$current_chat_id]}" -gt 0 && ! "${WORKER_FIFO_LIST[*]}" =~ "$current_chat_id" ]]; then
+                  echo "$worker_pid:$current_chat_id"
+                  WORKER_FIFO_LIST[i]="$worker_pid:$current_chat_id"
+
+                  ((CHAT_DICTIONARY[$current_chat_id]--))
+
+                  if [[ "${CHAT_DICTIONARY[$current_chat_id]}" -le 0 ]]; then
+                      unset CHAT_DICTIONARY[$current_chat_id]
+                  fi
+
+                  fifo="$WORKERS_FIFO_DIR/$worker_pid"
+                  echo "$current_chat_id" > "$fifo"
+                  echo "Назначен chat_id $current_chat_id воркеру $worker_pid"
+                  break
+              fi
+          done
+      fi
+  done
 }

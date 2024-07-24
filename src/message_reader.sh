@@ -1,16 +1,15 @@
 init_reader() {
-
     mkdir -p "$BASE_FIFO_DIR"
     LAST_UPDATE_ID=0
 
     if [[ ! -p "$NOTIFICATIONS_FIFO" ]]; then
         mkfifo "$NOTIFICATIONS_FIFO"
-fi
+    fi
 }
 
 fetch_messages() {
     default_handler "start fetching $LAST_UPDATE_ID" "INFO"
-
+    echo "fetch"
     local messages=$(get_tg_messages $LAST_UPDATE_ID)
 
     while IFS= read -r message; do
@@ -36,7 +35,7 @@ fetch_messages() {
         echo "$text;" >> "$dialog_file"
 
         default_handler "$chat_id to $NOTIFICATIONS_FIFO" "INFO"
-        echo ":$chat_id" > "$NOTIFICATIONS_FIFO"
+        echo "$chat_id" > "$NOTIFICATIONS_FIFO"
     done < <(echo "$messages" | jq -c '.[]')
 }
 
