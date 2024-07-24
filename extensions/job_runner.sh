@@ -1,4 +1,6 @@
-JOBS_LIST=()
+init_job_runner(){
+    export JOBS_LIST=()
+}
 
 add_job(){
     local function="$1"
@@ -36,6 +38,7 @@ job_start(){
 
     while true; do
         $func
+        catch 'default_handler "error of start of $func" "ERROR"'
         sleep $timeout
     done
 }

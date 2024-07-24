@@ -5,14 +5,27 @@ using extensions
 using src
 
 startup() {
+   init_killer
    process_killer_start
+
+   init_job_runner
    job_runner_start
+   catch '
+      default_handler "error in startup" "ERROR" 
+   '
 }
 
 main() {
-   reader_init
+   
+   init_reader
    add_job fetch_messages 1 5
-   add_job process_messages 1 2
+
+   init_balancer
+   add_job balancer_process 1 3
+#s   add_job process_message 1 2
+   catch '
+      default_handler "error in main" "ERROR" 
+   '
 }
 
 main
