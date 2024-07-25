@@ -11,4 +11,5 @@ export LAST_UPDATE_FILE="tmp/last_update_id.txt"
 export NOTIFICATIONS_FIFO="$BASE_FIFO_DIR/messages"
 
 # Balancer And Workers
+export CHAR_STATES_DIR="tmp/tg_states"
 export WORKERS_FIFO_DIR="tmp/workers_fifos"

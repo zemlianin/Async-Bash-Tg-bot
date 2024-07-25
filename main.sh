@@ -16,11 +16,11 @@ startup() {
 main() {
    
    init_reader
-   add_job fetch_messages 1 5
+   add_job fetch_messages 1 1
 
-   add_job balancer_process 1 3
+   add_job balancer_process 1 0.1
 
-   add_job process_message 2 1
+   add_job process_message 4 1
    catch '
       default_handler "error in main" "ERROR" 
    '
@@ -28,4 +28,4 @@ main() {
 
 main
 startup
-sleep 100
+sleep 100000
