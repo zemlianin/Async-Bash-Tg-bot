@@ -1,6 +1,7 @@
 #!/bin/bash
 # main
 export SRC_DIRECTORY='./src'
+export LOG_FILE="log.log"
 
 # Job Runner
 

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 trace_call() {
     local frame=0
     
@@ -10,25 +12,6 @@ trace_call() {
     echo "$stack_trace"
 }
 export -f trace_call
-
-try() {
-    local cmds="$1"
-
-    while IFS= read -r cmd; do
-        eval "$cmd>/dev/null"
-        local exit_code=$?
-
-        if [ $exit_code -ne 0 ]; then
-
-            echo "ERROR $exit_code in $cmd"
-
-            return $exit_code
-        fi
-    done <<< "$cmds"
-    
-    return 0
-}
-export -f try
 
 catch() {
     local exit_code=$?

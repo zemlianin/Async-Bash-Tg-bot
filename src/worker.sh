@@ -1,3 +1,5 @@
+#!/bin/bash
+
 worker_start(){
     local pid=$BASHPID
     local fifo="$WORKERS_FIFO_DIR/$pid"

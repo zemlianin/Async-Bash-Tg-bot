@@ -1,3 +1,5 @@
+#!/bin/bash
+
 init_reader() {
     mkdir -p "$BASE_FIFO_DIR"
     LAST_UPDATE_ID=0
@@ -8,7 +10,7 @@ init_reader() {
 }
 
 fetch_messages() {
-    default_handler "start fetching $LAST_UPDATE_ID" "INFO"
+    default_logger "start fetching $LAST_UPDATE_ID" "INFO"
     echo "fetch"
     local messages=$(get_tg_messages $LAST_UPDATE_ID)
 
@@ -26,15 +28,15 @@ fetch_messages() {
         
         if [[ ! -f "$dialog_file" ]]; then
             echo > "$dialog_file"
-            catch 'default_handler "Error of dialog_file creating" "ERROR"'
+            catch 'default_logger "Error of dialog_file creating" "ERROR"'
         fi
 
         text=$(echo "$message" | jq -r '.message.text')
 
-        default_handler "text to $dialog_file" "INFO"
+        default_logger "text to $dialog_file" "INFO"
         echo "$text;" >> "$dialog_file"
 
-        default_handler "$chat_id to $NOTIFICATIONS_FIFO" "INFO"
+        default_logger "$chat_id to $NOTIFICATIONS_FIFO" "INFO"
         echo "$chat_id" > "$NOTIFICATIONS_FIFO"
     done < <(echo "$messages" | jq -c '.[]')
 }
@@ -42,7 +44,7 @@ fetch_messages() {
 get_tg_messages(){
     local last_update_id=$1
     local updates=$(curl -s "https://api.telegram.org/bot$BOT_TOKEN/getUpdates?offset=$last_update_id")
-    default_handler "$updates" "Info"
+    default_logger "$updates" "Info"
 
     messages=$(echo "$updates" | jq -c '.result')
 

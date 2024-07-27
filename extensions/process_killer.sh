@@ -1,3 +1,5 @@
+#!/bin/bash
+
 CHILD_PIDS=()
 
 add_new_pid_for_killing(){

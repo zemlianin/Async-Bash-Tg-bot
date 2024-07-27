@@ -1,3 +1,5 @@
+#!/bin/bash
+
 WORKER_FIFO_LIST=()
 declare -A CHAT_DICTIONARY
 
@@ -9,9 +11,6 @@ balancer_process() {
       chat_id="$notification"
       ((CHAT_DICTIONARY["$chat_id"]++))
       echo "Балансер заметил сообщение"
-#      for id in "${!CHAT_DICTIONARY[@]}"; do
-#        echo "Chat ID $id has ${CHAT_DICTIONARY[$id]} messages."
-#      done
     else
       chat_id="${notification#!}"
 

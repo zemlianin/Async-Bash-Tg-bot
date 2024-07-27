@@ -9,7 +9,7 @@ startup() {
    
    job_runner_start
    catch '
-      default_handler "error in startup" "ERROR" 
+      default_logger "error in startup" "ERROR" 
    '
 }
 
@@ -22,10 +22,12 @@ main() {
 
    add_job process_message 4 1
    catch '
-      default_handler "error in main" "ERROR" 
+      default_logger "error in main" "ERROR" 
    '
 }
 
-main
-startup
-sleep 100000
+#main
+#startup
+#sleep 100000
+
+trace_call

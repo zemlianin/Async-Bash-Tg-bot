@@ -1,3 +1,5 @@
+#!/bin/bash
+
 JOBS_LIST=()
 
 add_job(){
@@ -12,7 +14,6 @@ add_job(){
 
 
 job_runner_start(){
-    echo "${JOBS_LIST[@]}"
     for job in "${JOBS_LIST[@]}"
     do
         IFS=':'
@@ -21,12 +22,12 @@ job_runner_start(){
         for ((i=1; i<=num_of_process; i++))
         do
             job_start "$func" $timeout &
-            catch 'default_handler "error of run job: $func" "ERROR"'
+            catch 'default_logger "error of run job: $func" "ERROR"'
             
             local pid=$!
 
             add_new_pid_for_killing $pid
-            catch 'default_handler "error of write pid" "ERROR"'
+            catch 'default_logger "error of write pid" "ERROR"'
         done
     done
 }
@@ -37,7 +38,7 @@ job_start(){
 
     while true; do
         $func
-        catch 'default_handler "error of start of $func" "ERROR"'
+        catch 'default_logger "error of start of $func" "ERROR"'
         sleep $timeout
     done
 }
