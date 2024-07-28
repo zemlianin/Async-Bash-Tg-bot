@@ -11,7 +11,7 @@ init_reader() {
 
 fetch_messages() {
     default_logger "start fetching $LAST_UPDATE_ID" "INFO"
-    echo "fetch"
+    
     local messages=$(get_tg_messages $LAST_UPDATE_ID)
 
     while IFS= read -r message; do

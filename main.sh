@@ -26,8 +26,8 @@ main() {
    '
 }
 
-#main
-#startup
-#sleep 100000
+main
+startup
 
-trace_call
+echo "Bot was started. Click Enter for stoping of bot"
+read
