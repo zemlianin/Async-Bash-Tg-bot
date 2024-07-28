@@ -56,7 +56,8 @@ balance() {
 
       if [[ "$chat_id" == "0" ]]; then
           for current_chat_id in "${!CHAT_DICTIONARY[@]}"; do
-              if [[ "${CHAT_DICTIONARY[$current_chat_id]}" -gt 0 && ! "${WORKER_FIFO_LIST[*]}" =~ "$current_chat_id" ]]; then
+              if [[ "${CHAT_DICTIONARY[$current_chat_id]}" -gt 0 
+              && ! "${WORKER_FIFO_LIST[*]}" =~ "$current_chat_id" ]]; then
                   echo "$worker_pid:$current_chat_id"
                   WORKER_FIFO_LIST[i]="$worker_pid:$current_chat_id"
 
@@ -66,7 +67,7 @@ balance() {
                       unset CHAT_DICTIONARY[$current_chat_id]
                   fi
 
-                  fifo="$WORKERS_FIFO_DIR/$worker_pid"
+                  local fifo="$WORKERS_FIFO_DIR/$worker_pid"
                   echo "$current_chat_id" > "$fifo"
                   echo "Назначен chat_id $current_chat_id воркеру $worker_pid"
                   break

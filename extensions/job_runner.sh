@@ -6,7 +6,6 @@ add_job(){
     local function="$1"
     local num_of_process=$2
     local timeout=$3
-    local pid=$0
 
     combined_record="$function:$num_of_process:$timeout"
     JOBS_LIST+=("$combined_record")
