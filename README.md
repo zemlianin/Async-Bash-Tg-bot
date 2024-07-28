@@ -17,7 +17,7 @@ sudo apt-get install curl
 sudo apt-get install jq
 ```
 
-Добавить Bot-Token вашего Telegram бота.
+Добавление Bot-Token вашего Telegram бота.
 - Открыть settings.sh
 - Изменить строку
   ``` export BOT_TOKEN="" ```
